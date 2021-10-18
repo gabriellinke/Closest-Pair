@@ -7,6 +7,7 @@ Thiago de Mendonça Mildemberger -
 #include <vector>
 #include <string>
 #include <cmath>
+#include <algorithm>
 
 #include <iomanip>
 #include <fstream>
@@ -17,6 +18,7 @@ using std::endl;
 
 using std::fixed;
 using std::ifstream;
+using std::min;
 using std::setprecision;
 using std::string;
 using std::vector;
@@ -57,12 +59,37 @@ double getEuclideanDistance(Pair pair)
 	return sqrt((pair.first.x - pair.second.x) * (pair.first.x - pair.second.x) + (pair.first.y - pair.second.y) * (pair.first.y - pair.second.y));
 }
 
+// Daria pra chamar recursivamente passando subvetores, porém criar um subvetor é uma operação O(n), e só passar
+// start e end vai ser O(1)
+Pair closestPairRecursive(vector<Point> points, int start, int end)
+{
+	// Base case
+	int size = end - start;
+	if (size <= 3)
+	{
+		if (size == 3)
+		{
+			return min({
+						   Pair(points[start], points[start + 1]),
+						   Pair(points[start], points[start + 2]),
+						   Pair(points[start + 1], points[start + 2]),
+					   },
+					   [](Pair p1, Pair p2)
+					   {
+						   return getEuclideanDistance(p1) < getEuclideanDistance(p2);
+					   });
+		}
+		else if (size == 2)
+			return Pair(points[start], points[start + 1]);
+		else
+			cout << "O conjunto tem apenas um ponto" << endl;
+	}
+}
+
 Pair closestPair(vector<Point> points)
 {
-	Pair teste;
-	teste.first = points[0];
-	teste.second = points[1];
-	return teste;
+	// Construct Px and Py in O(nlogn) time
+	return closestPairRecursive(points, 0, points.size());
 }
 
 int main(int argc, char *argv[])
