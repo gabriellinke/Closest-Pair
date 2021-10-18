@@ -6,6 +6,7 @@ Thiago de Mendonça Mildemberger -
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cmath>
 
 #include <iomanip>
 #include <fstream>
@@ -26,6 +27,8 @@ struct Point
 	double y;
 };
 
+using Pair = std::pair<Point, Point>;
+
 vector<Point> readPoints(const string inputFile)
 {
 	ifstream fileReader(inputFile);
@@ -36,11 +39,12 @@ vector<Point> readPoints(const string inputFile)
 		getchar();
 		// return;
 	}
-	int size = 0;
-	fileReader >> size;
 	vector<Point> points;
-	points.reserve(size);
+	int size = 0;
 	Point point;
+	fileReader >> size;
+	points.reserve(size);
+
 	while (fileReader >> point.x >> point.y)
 	{
 		points.push_back(point);
@@ -48,9 +52,17 @@ vector<Point> readPoints(const string inputFile)
 	return points;
 }
 
-Point closestPair(vector<Point> points)
+double getEuclideanDistance(Pair pair)
 {
-	return points[0];
+	return sqrt((pair.first.x - pair.second.x) * (pair.first.x - pair.second.x) + (pair.first.y - pair.second.y) * (pair.first.y - pair.second.y));
+}
+
+Pair closestPair(vector<Point> points)
+{
+	Pair teste;
+	teste.first = points[0];
+	teste.second = points[1];
+	return teste;
 }
 
 int main(int argc, char *argv[])
@@ -58,9 +70,15 @@ int main(int argc, char *argv[])
 	if (argc != 2)
 		return 1;
 
-	vector<Point> points = readPoints(argv[1]);
+	time_t start, end;
+	start = clock();
 
-	Point closest = closestPair(points);
-	cout << "Closest " << setprecision(6) << fixed << closest.x << " " << closest.y << endl;
+	vector<Point> points = readPoints(argv[1]);
+	Pair closest = closestPair(points);
+
+	end = clock();
+	double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+
+	cout << setprecision(6) << fixed << time_taken << " " << getEuclideanDistance(closest) << " " << closest.first.x << " " << closest.first.y << " " << closest.second.x << " " << closest.second.y << endl;
 	return 0;
 }
