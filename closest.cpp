@@ -32,6 +32,16 @@ struct Point
 
 using Pair = std::pair<Point, Point>;
 
+bool compareYCoordinate(Point a, Point b)
+{
+	return a.y < b.y;
+}
+
+bool compareXCoordinate(Point a, Point b)
+{
+	return a.x < b.x;
+}
+
 vector<Point> readPoints(const string inputFile)
 {
 	ifstream fileReader(inputFile);
@@ -95,13 +105,38 @@ Pair closestPairRecursive(vector<Point> points, int start, int end)
 	Pair d = getEuclideanDistance(d1) < getEuclideanDistance(d2) ? d1 : d2;
 
 	//Conquista
-
+	vector<Point> remainingPoints;
+	remainingPoints.reserve(end - start + 1);
+	for (int i = start; i <= end; i++)
+	{
+		if (getEuclideanDistance(Pair(points[m], points[i])) < getEuclideanDistance(d))
+			remainingPoints.push_back(points[i]);
+	}
+	sort(remainingPoints.begin(), remainingPoints.end(), compareYCoordinate);
+	for (int i = 0; i < remainingPoints.size(); i++) // Acho que essa parte não está certa, mas não sei como melhorar
+	{
+		for (int j = i + 1; j <= remainingPoints.size(); j++)
+			d = getEuclideanDistance(Pair(remainingPoints[i], remainingPoints[i + j])) < getEuclideanDistance(d) ? Pair(remainingPoints[i], remainingPoints[i + j]) : d;
+	}
 	return d;
 }
 
-bool compareXCoordinate(Point a, Point b)
+// Algoritmo O(n²) para testes
+Pair closestPairTest(vector<Point> points)
 {
-	return a.x < b.x;
+	Pair d = Pair(points[0], points[1]);
+	for (int i = 0; i < points.size(); i++)
+	{
+		for (int j = 0; j < points.size(); j++)
+		{
+			if (i != j)
+			{
+				if (getEuclideanDistance(Pair(points[i], points[j])) < getEuclideanDistance(d))
+					d = Pair(points[i], points[j]);
+			}
+		}
+	}
+	return d;
 }
 
 Pair closestPair(vector<Point> points)
