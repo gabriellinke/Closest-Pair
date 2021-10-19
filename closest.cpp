@@ -20,6 +20,7 @@ using std::fixed;
 using std::ifstream;
 using std::min;
 using std::setprecision;
+using std::sort;
 using std::string;
 using std::vector;
 
@@ -59,12 +60,12 @@ double getEuclideanDistance(Pair pair)
 	return sqrt((pair.first.x - pair.second.x) * (pair.first.x - pair.second.x) + (pair.first.y - pair.second.y) * (pair.first.y - pair.second.y));
 }
 
-// Daria pra chamar recursivamente passando subvetores, porém criar um subvetor é uma operação O(n), e só passar
-// start e end vai ser O(1)
+// Daria pra chamar recursivamente passando subvetores, porém criar um subvetor é uma operação O(n),
+// e só passar start e end vai ser O(1)
 Pair closestPairRecursive(vector<Point> points, int start, int end)
 {
-	// Base case
-	int size = end - start;
+	// Caso base
+	int size = end - start + 1;
 	if (size <= 3)
 	{
 		if (size == 3)
@@ -82,14 +83,32 @@ Pair closestPairRecursive(vector<Point> points, int start, int end)
 		else if (size == 2)
 			return Pair(points[start], points[start + 1]);
 		else
-			cout << "O conjunto tem apenas um ponto" << endl;
+		{
+			throw std::runtime_error("O conjunto tem apenas um ponto");
+		}
 	}
+
+	// Divisão
+	int m = (end + start) / 2;
+	Pair d1 = closestPairRecursive(points, start, m);
+	Pair d2 = closestPairRecursive(points, m + 1, end);
+	Pair d = getEuclideanDistance(d1) < getEuclideanDistance(d2) ? d1 : d2;
+
+	//Conquista
+
+	return d;
+}
+
+bool compareXCoordinate(Point a, Point b)
+{
+	return a.x < b.x;
 }
 
 Pair closestPair(vector<Point> points)
 {
-	// Construct Px and Py in O(nlogn) time
-	return closestPairRecursive(points, 0, points.size());
+	// Construct Px in O(nlogn) time
+	sort(points.begin(), points.end(), compareXCoordinate);
+	return closestPairRecursive(points, 0, points.size() - 1);
 }
 
 int main(int argc, char *argv[])
@@ -97,13 +116,12 @@ int main(int argc, char *argv[])
 	if (argc != 2)
 		return 1;
 
-	time_t start, end;
-	start = clock();
+	time_t start = clock();
 
 	vector<Point> points = readPoints(argv[1]);
 	Pair closest = closestPair(points);
 
-	end = clock();
+	time_t end = clock();
 	double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
 
 	cout << setprecision(6) << fixed << time_taken << " " << getEuclideanDistance(closest) << " " << closest.first.x << " " << closest.first.y << " " << closest.second.x << " " << closest.second.y << endl;
