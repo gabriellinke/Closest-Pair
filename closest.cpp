@@ -1,6 +1,6 @@
 /**
 Gabriel Henrique Linke - 2126630
-Thiago de Mendonça Mildemberger - 
+Thiago de Mendonça Mildemberger - 1716980
 **/
 
 #include <iostream>
@@ -16,6 +16,7 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+using std::abs;
 using std::fixed;
 using std::ifstream;
 using std::min;
@@ -70,8 +71,6 @@ double getEuclideanDistance(Pair pair)
 	return sqrt((pair.first.x - pair.second.x) * (pair.first.x - pair.second.x) + (pair.first.y - pair.second.y) * (pair.first.y - pair.second.y));
 }
 
-// Daria pra chamar recursivamente passando subvetores, porém criar um subvetor é uma operação O(n),
-// e só passar start e end vai ser O(1)
 Pair closestPairRecursive(vector<Point> points, int start, int end)
 {
 	// Caso base
@@ -109,14 +108,14 @@ Pair closestPairRecursive(vector<Point> points, int start, int end)
 	remainingPoints.reserve(end - start + 1);
 	for (int i = start; i <= end; i++)
 	{
-		if (getEuclideanDistance(Pair(points[m], points[i])) < getEuclideanDistance(d))
+		if (abs(points[i].x - points[m].x) < getEuclideanDistance(d))
 			remainingPoints.push_back(points[i]);
 	}
 	sort(remainingPoints.begin(), remainingPoints.end(), compareYCoordinate);
-	for (int i = 0; i < remainingPoints.size(); i++) // Acho que essa parte não está certa, mas não sei como melhorar
+	for (int i = 0; i < remainingPoints.size(); i++)
 	{
-		for (int j = i + 1; j <= remainingPoints.size(); j++)
-			d = getEuclideanDistance(Pair(remainingPoints[i], remainingPoints[i + j])) < getEuclideanDistance(d) ? Pair(remainingPoints[i], remainingPoints[i + j]) : d;
+		for (int j = i + 1; j < min((int)remainingPoints.size(), 15); j++)
+			d = getEuclideanDistance(Pair(remainingPoints[i], remainingPoints[j])) < getEuclideanDistance(d) ? Pair(remainingPoints[i], remainingPoints[j]) : d;
 	}
 	return d;
 }
@@ -160,5 +159,14 @@ int main(int argc, char *argv[])
 	double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
 
 	cout << setprecision(6) << fixed << time_taken << " " << getEuclideanDistance(closest) << " " << closest.first.x << " " << closest.first.y << " " << closest.second.x << " " << closest.second.y << endl;
+
+	// Pair closest2 = closestPairTest(points);
+
+	// if (getEuclideanDistance(closest) != getEuclideanDistance(closest2))
+	// {
+	// 	cout << "Results should be the same"
+	// 		 << " n: " << points.size() << endl;
+	// }
+
 	return 0;
 }
