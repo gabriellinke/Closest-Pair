@@ -1,5 +1,5 @@
 all:
-	gcc genpoints.c -o genpoints -lm
+	g++ closest.cpp -o closest -lm -O2
 
 clean:
-	rm -f genpoints;
+	rm -f closest;

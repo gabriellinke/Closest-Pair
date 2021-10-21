@@ -71,7 +71,7 @@ double getEuclideanDistance(Pair pair)
 	return sqrt((pair.first.x - pair.second.x) * (pair.first.x - pair.second.x) + (pair.first.y - pair.second.y) * (pair.first.y - pair.second.y));
 }
 
-Pair closestPairRecursive(vector<Point> points, int start, int end)
+Pair closestPairRecursive(vector<Point> &points, int start, int end)
 {
 	// Caso base
 	int size = end - start + 1;
@@ -114,14 +114,14 @@ Pair closestPairRecursive(vector<Point> points, int start, int end)
 	sort(remainingPoints.begin(), remainingPoints.end(), compareYCoordinate);
 	for (int i = 0; i < remainingPoints.size(); i++)
 	{
-		for (int j = i + 1; j < min((int)remainingPoints.size(), 15); j++)
+		for (int j = i + 1; j < min((int)remainingPoints.size(), i + 15); j++)
 			d = getEuclideanDistance(Pair(remainingPoints[i], remainingPoints[j])) < getEuclideanDistance(d) ? Pair(remainingPoints[i], remainingPoints[j]) : d;
 	}
 	return d;
 }
 
 // Algoritmo O(n²) para testes
-Pair closestPairTest(vector<Point> points)
+Pair closestPairTest(vector<Point> &points)
 {
 	Pair d = Pair(points[0], points[1]);
 	for (int i = 0; i < points.size(); i++)
@@ -138,7 +138,7 @@ Pair closestPairTest(vector<Point> points)
 	return d;
 }
 
-Pair closestPair(vector<Point> points)
+Pair closestPair(vector<Point> &points)
 {
 	// Construct Px in O(nlogn) time
 	sort(points.begin(), points.end(), compareXCoordinate);
